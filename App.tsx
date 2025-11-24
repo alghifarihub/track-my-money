@@ -14,7 +14,7 @@ import { AuthPage } from './components/AuthPage';
 import { financeService } from './services/financeService';
 import { Transaction, DashboardStats as StatsType, UserProfile, CurrencyCode, BudgetLimits, DateRange } from './types';
 import { TRANSLATIONS } from './constants';
-import { Card, CardContent, CardHeader, CardTitle, Button, Input, Switch, Badge, Separator } from './components/ui/DesignSystem';
+import { Card, CardContent, CardHeader, CardTitle, Button, Input, Switch, Badge, Separator, Dialog } from './components/ui/DesignSystem';
 import { UserProvider, useUser } from './contexts/UserContext';
 import { supabase } from './lib/supabase'; // UPDATED IMPORT
 import { Session } from '@supabase/supabase-js';
@@ -42,6 +42,10 @@ const AppContent = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeView, setActiveView] = useState<View>('overview');
   const [toast, setToast] = useState<{message: string, visible: boolean}>({ message: '', visible: false });
+
+  // Balance Modal State
+  const [isBalanceModalOpen, setIsBalanceModalOpen] = useState(false);
+  const [tempBalance, setTempBalance] = useState('');
 
   // --- Data Fetching ---
   const loadData = async () => {
@@ -107,6 +111,23 @@ const AppContent = () => {
     }
   };
 
+  const handleSaveInitialBalance = async () => {
+     if (!profile) return;
+     const num = parseFloat(tempBalance) || 0;
+     try {
+         await updateProfile({ ...profile, initialBalance: num });
+         setIsBalanceModalOpen(false);
+         showToast("Initial balance updated");
+     } catch (e) {
+         console.error(e);
+     }
+  };
+
+  const openBalanceModal = () => {
+      setTempBalance(profile?.initialBalance?.toString() || '');
+      setIsBalanceModalOpen(true);
+  };
+
   // --- Helpers & Filtering ---
   const t = TRANSLATIONS[profile?.language || 'en'];
   const activeCategories = useMemo(() => Object.keys(budgetLimits).sort(), [budgetLimits]);
@@ -138,12 +159,15 @@ const AppContent = () => {
   const stats: StatsType = useMemo(() => {
     const totalIncome = filteredTransactions.filter(t => t.type === 'income').reduce((acc, curr) => acc + curr.amount, 0);
     const totalExpense = filteredTransactions.filter(t => t.type === 'expense').reduce((acc, curr) => acc + curr.amount, 0);
-    const totalBalance = totalIncome - totalExpense;
+    
+    // Updated Logic: Balance = Initial + Income - Expense
+    const initial = profile?.initialBalance || 0;
+    const totalBalance = initial + totalIncome - totalExpense;
     
     const savingsRate = totalIncome > 0 ? ((totalIncome - totalExpense) / totalIncome) * 100 : 0;
 
     return { totalBalance, totalIncome, totalExpense, savingsRate };
-  }, [filteredTransactions]);
+  }, [filteredTransactions, profile?.initialBalance]);
 
   // --- Settings View (Apple Style Overhaul) ---
   const SettingsView = () => {
@@ -369,7 +393,12 @@ const AppContent = () => {
         case 'overview':
           return (
             <div className="space-y-6">
-              <DashboardStats stats={stats} formatCurrency={formatCurrency} labels={t} />
+              <DashboardStats 
+                  stats={stats} 
+                  formatCurrency={formatCurrency} 
+                  labels={t} 
+                  onEditBalance={openBalanceModal}
+              />
               <Analytics 
                 transactions={filteredTransactions} 
                 labels={t} 
@@ -458,6 +487,32 @@ const AppContent = () => {
 
       {/* Product Tour - Shown if complete but not seen */}
       <AppTour />
+
+      {/* Initial Balance Modal */}
+      <Dialog 
+        open={isBalanceModalOpen} 
+        onOpenChange={setIsBalanceModalOpen} 
+        title={t.setInitialBalance}
+      >
+        <div className="space-y-4">
+            <p className="text-sm text-zinc-400">{t.initialBalanceDesc}</p>
+            <Input 
+                type="number" 
+                value={tempBalance} 
+                onChange={e => setTempBalance(e.target.value)}
+                placeholder="0.00"
+                autoFocus
+            />
+            <div className="flex justify-end gap-2 pt-2">
+                <Button variant="secondary" onClick={() => setIsBalanceModalOpen(false)}>
+                    {t.cancel}
+                </Button>
+                <Button onClick={handleSaveInitialBalance}>
+                    {t.save}
+                </Button>
+            </div>
+        </div>
+      </Dialog>
 
       {/* Toast Notification */}
       {toast.visible && (

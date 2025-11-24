@@ -1,68 +1,87 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Card, CardContent } from './ui/DesignSystem';
 import { DashboardStats as StatsType } from '../types';
-import { ArrowUpRight, ArrowDownRight, Wallet, PiggyBank } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight, Wallet, PiggyBank, Edit3 } from 'lucide-react';
 
-interface Props {
-  stats: StatsType;
-  formatCurrency: (val: number) => string;
-  labels: any;
-}
+// Simple Hook for Odometer Effect
+export const useCountUp = (end: number, duration = 1000) => {
+  const [count, setCount] = React.useState(0);
 
-// Custom Hook for Odometer Effect
-const useCountUp = (end: number, duration: number = 1500) => {
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    let startTime: number | null = null;
-    
-    // If end is 0, just set to 0 instantly to avoid weird float math
-    if (end === 0) {
-        setCount(0);
-        return;
-    }
-
+  React.useEffect(() => {
+    let startTimestamp: number | null = null;
     const step = (timestamp: number) => {
-      if (!startTime) startTime = timestamp;
-      const progress = Math.min((timestamp - startTime) / duration, 1);
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
       
-      // Cubic easing out for a smooth "landing"
-      const easeOut = 1 - Math.pow(1 - progress, 3);
+      // Easing function: easeOutQuart
+      const ease = 1 - Math.pow(1 - progress, 4);
       
-      setCount(end * easeOut);
-
+      setCount(end * ease);
       if (progress < 1) {
         window.requestAnimationFrame(step);
       }
     };
-    
     window.requestAnimationFrame(step);
   }, [end, duration]);
 
   return count;
 };
 
-export const DashboardStats: React.FC<Props> = ({ stats, formatCurrency, labels }) => {
+interface Props {
+  stats: StatsType;
+  formatCurrency: (val: number) => string;
+  labels: any;
+  onEditBalance?: () => void;
+}
+
+export const DashboardStats: React.FC<Props> = ({ stats, formatCurrency, labels, onEditBalance }) => {
+  
   const animatedBalance = useCountUp(stats.totalBalance);
   const animatedIncome = useCountUp(stats.totalIncome);
   const animatedExpense = useCountUp(stats.totalExpense);
-  const animatedSavings = useCountUp(stats.savingsRate);
+
+  // Savings Rate Logic
+  const savingsRate = stats.savingsRate; // Already calculated in App.tsx
+  let statusColor = "text-zinc-500";
+  let barColor = "bg-zinc-800";
+  let statusText = labels.noIncome;
+
+  if (stats.totalIncome > 0) {
+      if (savingsRate >= 20) {
+          statusColor = "text-emerald-500";
+          barColor = "bg-emerald-500";
+          statusText = labels.excellent;
+      } else if (savingsRate > 0) {
+          statusColor = "text-yellow-500";
+          barColor = "bg-yellow-500";
+          statusText = labels.good;
+      } else {
+          statusColor = "text-red-500";
+          barColor = "bg-red-500";
+          statusText = labels.needsWork;
+      }
+  }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-      {/* Total Balance */}
-      <Card id="tour-balance" className="border-l-4 border-l-orange-500 !bg-gradient-to-br from-zinc-900 to-zinc-950">
-        <CardContent className="flex flex-col justify-between h-full">
+      {/* Total Balance - Added Edit Button */}
+      <Card id="tour-balance" className="border-l-4 border-l-orange-500 bg-gradient-to-br from-zinc-900 to-zinc-950">
+        <CardContent className="flex flex-col justify-between h-full relative">
           <div className="flex justify-between items-start">
-            <div className="p-2 bg-orange-500/10 rounded-full animate-in zoom-in duration-500">
+            <div className="p-2 bg-orange-500/10 rounded-full">
                 <Wallet className="w-5 h-5 text-orange-500" />
             </div>
-            <span className="text-xs font-medium text-zinc-500 uppercase tracking-wider">{labels.totalBalance}</span>
+            <div className="flex items-center gap-2">
+                 <span className="text-xs font-medium text-zinc-500 uppercase tracking-wider">{labels.totalBalance}</span>
+                 {onEditBalance && (
+                    <button onClick={onEditBalance} className="text-zinc-600 hover:text-white transition-colors">
+                        <Edit3 size={12} />
+                    </button>
+                 )}
+            </div>
           </div>
           <div className="mt-4">
-            <h2 className="text-3xl font-bold text-white tracking-tight">
-                {formatCurrency(animatedBalance)}
-            </h2>
+            <h2 className="text-3xl font-bold text-white tracking-tight">{formatCurrency(animatedBalance)}</h2>
             <p className="text-sm text-zinc-500 mt-1">{labels.availableFunds}</p>
           </div>
         </CardContent>
@@ -72,7 +91,7 @@ export const DashboardStats: React.FC<Props> = ({ stats, formatCurrency, labels 
       <Card>
         <CardContent>
           <div className="flex justify-between items-start mb-4">
-             <div className="p-2 bg-emerald-500/10 rounded-full animate-in zoom-in duration-500 delay-100">
+             <div className="p-2 bg-emerald-500/10 rounded-full">
                 <ArrowUpRight className="w-5 h-5 text-emerald-500" />
             </div>
              <span className="text-xs font-medium text-zinc-500 uppercase tracking-wider">{labels.income}</span>
@@ -88,7 +107,7 @@ export const DashboardStats: React.FC<Props> = ({ stats, formatCurrency, labels 
       <Card>
         <CardContent>
           <div className="flex justify-between items-start mb-4">
-             <div className="p-2 bg-rose-500/10 rounded-full animate-in zoom-in duration-500 delay-200">
+             <div className="p-2 bg-rose-500/10 rounded-full">
                 <ArrowDownRight className="w-5 h-5 text-rose-500" />
             </div>
              <span className="text-xs font-medium text-zinc-500 uppercase tracking-wider">{labels.expenses}</span>
@@ -100,19 +119,29 @@ export const DashboardStats: React.FC<Props> = ({ stats, formatCurrency, labels 
         </CardContent>
       </Card>
 
-      {/* Savings Rate */}
+      {/* Savings Rate - Revamped */}
       <Card>
         <CardContent>
            <div className="flex justify-between items-start mb-4">
-             <div className="p-2 bg-blue-500/10 rounded-full animate-in zoom-in duration-500 delay-300">
+             <div className="p-2 bg-blue-500/10 rounded-full">
                 <PiggyBank className="w-5 h-5 text-blue-500" />
             </div>
              <span className="text-xs font-medium text-zinc-500 uppercase tracking-wider">{labels.savingsRate}</span>
           </div>
-          <h2 className="text-2xl font-bold text-white">{animatedSavings.toFixed(1)}%</h2>
-           <p className="text-sm text-zinc-500 mt-1">{labels.target}: 20%</p>
-           <div className="w-full bg-zinc-800 h-1.5 mt-3 rounded-full overflow-hidden">
-             <div className="bg-blue-500 h-full rounded-full transition-all duration-1000 ease-out" style={{ width: `${Math.min(animatedSavings, 100)}%` }}></div>
+          <div className="flex justify-between items-end">
+              <h2 className="text-2xl font-bold text-white">
+                  {stats.totalIncome > 0 ? `${savingsRate.toFixed(1)}%` : '--'}
+              </h2>
+              <span className={`text-xs font-medium ${statusColor} mb-1.5`}>
+                  {statusText}
+              </span>
+          </div>
+           
+           <div className="w-full bg-zinc-800 h-2 mt-3 rounded-full overflow-hidden">
+             <div 
+                className={`${barColor} h-full rounded-full transition-all duration-1000`} 
+                style={{ width: `${stats.totalIncome > 0 ? Math.max(0, Math.min(savingsRate, 100)) : 0}%` }}
+             ></div>
            </div>
         </CardContent>
       </Card>

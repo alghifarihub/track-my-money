@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { X } from 'lucide-react';
 
 // --- Card Component ---
 type CardProps = React.HTMLAttributes<HTMLDivElement> & { interactive?: boolean };
@@ -153,3 +154,34 @@ export const Badge = ({ children, variant = 'default', className = '', ...props 
 export const Separator = ({ className = '' }: { className?: string }) => (
   <div className={`h-[1px] w-full bg-zinc-800/50 ${className}`} />
 );
+
+// --- Dialog / Modal Component ---
+interface DialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  title?: string;
+  children: React.ReactNode;
+}
+
+export const Dialog = ({ open, onOpenChange, title, children }: DialogProps) => {
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+      <div className="bg-zinc-950 border border-zinc-800 rounded-xl w-full max-w-md shadow-2xl animate-in zoom-in-95 slide-in-from-bottom-4 duration-300 relative">
+        <div className="flex items-center justify-between p-4 border-b border-zinc-800">
+           {title && <h3 className="text-lg font-semibold text-white">{title}</h3>}
+           <button 
+             onClick={() => onOpenChange(false)}
+             className="text-zinc-400 hover:text-white transition-colors"
+           >
+             <X size={20} />
+           </button>
+        </div>
+        <div className="p-6">
+           {children}
+        </div>
+      </div>
+    </div>
+  );
+};

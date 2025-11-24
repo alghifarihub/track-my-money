@@ -36,6 +36,7 @@ export interface UserProfile {
   monthlyBudgetGoal?: number;
   emailAlerts?: boolean;
   monthlyReport?: boolean;
+  initialBalance?: number;
 }
 
 export type BudgetLimits = Record<string, number>;

@@ -131,7 +131,15 @@ export const TRANSLATIONS = {
     tourQuickAddTitle: "Quick Add",
     tourQuickAddDesc: "Easily record new income or expenses in seconds.",
     tourFilterTitle: "Date Filter",
-    tourFilterDesc: "Analyze your spending history by specific dates."
+    tourFilterDesc: "Analyze your spending history by specific dates.",
+    // New Balance & Savings
+    setInitialBalance: "Set Initial Balance",
+    initialBalanceDesc: "This amount will be added to your calculated income/expenses.",
+    save: "Save",
+    noIncome: "No Income Data",
+    excellent: "Excellent",
+    good: "Good",
+    needsWork: "Needs Work"
   },
   id: {
     overview: "Ringkasan",
@@ -216,6 +224,14 @@ export const TRANSLATIONS = {
     tourQuickAddTitle: "Tambah Cepat",
     tourQuickAddDesc: "Catat pemasukan atau pengeluaran baru dengan mudah.",
     tourFilterTitle: "Filter Tanggal",
-    tourFilterDesc: "Analisis riwayat pengeluaran Anda berdasarkan tanggal tertentu."
+    tourFilterDesc: "Analisis riwayat pengeluaran Anda berdasarkan tanggal tertentu.",
+    // New Balance & Savings
+    setInitialBalance: "Atur Saldo Awal",
+    initialBalanceDesc: "Jumlah ini akan ditambahkan ke perhitungan pemasukan/pengeluaran Anda.",
+    save: "Simpan",
+    noIncome: "Belum Ada Pemasukan",
+    excellent: "Sangat Baik",
+    good: "Baik",
+    needsWork: "Perlu Perbaikan"
   }
 };

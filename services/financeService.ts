@@ -15,7 +15,8 @@ const DEFAULT_SETTINGS: UserProfile = {
   darkMode: true,
   onboardingCompleted: false,
   emailAlerts: true,
-  monthlyReport: true
+  monthlyReport: true,
+  initialBalance: 0
 };
 
 // Initialize defaults if empty
@@ -105,6 +106,13 @@ export const financeService = {
          updatedBudgets[key] = Math.round(budgets[key] * rate * 100) / 100;
      });
      localStorage.setItem(BUDGET_STORAGE_KEY, JSON.stringify(updatedBudgets));
+     
+     // 4. Convert Initial Balance
+     const settings = JSON.parse(localStorage.getItem(SETTINGS_STORAGE_KEY) || JSON.stringify(DEFAULT_SETTINGS)) as UserProfile;
+     if (settings.initialBalance) {
+        settings.initialBalance = Math.round(settings.initialBalance * rate * 100) / 100;
+        localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
+     }
   },
 
   clearLocalSession: () => {
