@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, Button, Input } from './ui/DesignSystem';
-import { supabase } from '../lib/supabaseClient';
+import { supabase } from '../lib/supabase';
 import { TRANSLATIONS } from '../constants';
 import { Loader2, AlertCircle } from 'lucide-react';
 
