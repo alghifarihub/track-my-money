@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
-import { Menu, Bell, Loader2, CheckCircle2 } from 'lucide-react';
+import { Menu, Bell, Loader2, CheckCircle2, User, Settings, BellRing, Database, ChevronRight, LogOut, Shield } from 'lucide-react';
 import { DashboardStats } from './components/DashboardStats';
 import { Analytics } from './components/Analytics';
 import { TransactionList } from './components/TransactionList';
@@ -14,7 +14,7 @@ import { AuthPage } from './components/AuthPage';
 import { financeService } from './services/financeService';
 import { Transaction, DashboardStats as StatsType, UserProfile, CurrencyCode, BudgetLimits, DateRange } from './types';
 import { TRANSLATIONS } from './constants';
-import { Card, CardContent, CardHeader, CardTitle, Button, Input, Switch, Badge } from './components/ui/DesignSystem';
+import { Card, CardContent, CardHeader, CardTitle, Button, Input, Switch, Badge, Separator } from './components/ui/DesignSystem';
 import { UserProvider, useUser } from './contexts/UserContext';
 import { supabase } from './lib/supabase'; // UPDATED IMPORT
 import { Session } from '@supabase/supabase-js';
@@ -145,7 +145,7 @@ const AppContent = () => {
     return { totalBalance, totalIncome, totalExpense, savingsRate };
   }, [filteredTransactions]);
 
-  // --- Settings View ---
+  // --- Settings View (Apple Style Overhaul) ---
   const SettingsView = () => {
     const [formState, setFormState] = useState<UserProfile>(profile!);
     const [activeTab, setActiveTab] = useState('account');
@@ -163,170 +163,199 @@ const AppContent = () => {
       }
     };
 
-    // Auto-save toggle switches for better UX
     const handleToggle = (field: keyof UserProfile, val: boolean) => {
       const newState = { ...formState, [field]: val };
       setFormState(newState);
-      // Optional: Auto save
+      // Auto save trigger for better UX could go here
     };
 
+    const renderMenuItem = (id: string, label: string, icon: React.ReactNode) => (
+      <button
+        onClick={() => setActiveTab(id)}
+        className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+          activeTab === id 
+            ? 'bg-zinc-800 text-white shadow-md' 
+            : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
+        }`}
+      >
+        <span className={`${activeTab === id ? 'text-orange-500' : 'text-zinc-500'}`}>{icon}</span>
+        {label}
+        {activeTab === id && <ChevronRight size={16} className="ml-auto text-zinc-500 animate-in fade-in" />}
+      </button>
+    );
+
     return (
-      <div className="flex flex-col lg:flex-row gap-6 h-full min-h-[500px]">
-        {/* Settings Sidebar */}
-        <div className="w-full lg:w-64 flex flex-col gap-1">
-          {['account', 'preferences', 'notifications', 'data'].map((tab, idx) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`text-left px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 ${
-                activeTab === tab 
-                  ? 'bg-zinc-800 text-white border-l-2 border-orange-500 pl-6 shadow-lg shadow-black/20' 
-                  : 'text-zinc-400 hover:text-white hover:bg-zinc-900 hover:pl-5'
-              }`}
-              style={{ transitionDelay: `${idx * 50}ms` }}
-            >
-              {tab.charAt(0).toUpperCase() + tab.slice(1)}
-            </button>
-          ))}
+      <div className="flex flex-col lg:flex-row gap-8 h-full min-h-[600px] animate-in fade-in slide-in-from-bottom-4 duration-500">
+        {/* Settings Navigation */}
+        <div className="w-full lg:w-64 flex flex-col gap-2 shrink-0">
+          <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider px-4 mb-2">General</h3>
+          {renderMenuItem('account', t.accountSettings, <User size={18} />)}
+          {renderMenuItem('preferences', t.preferences, <Settings size={18} />)}
+          
+          <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider px-4 mt-6 mb-2">System</h3>
+          {renderMenuItem('notifications', 'Notifications', <BellRing size={18} />)}
+          {renderMenuItem('data', 'Data & Privacy', <Database size={18} />)}
         </div>
 
-        {/* Settings Content */}
-        <div className="flex-1 space-y-6">
-          <form onSubmit={handleSave} className="space-y-6 animate-in fade-in slide-in-from-right-8 duration-500 ease-out">
-             
-             {activeTab === 'account' && (
-               <Card>
-                 <CardHeader>
-                   <CardTitle>{t.accountSettings}</CardTitle>
-                 </CardHeader>
-                 <CardContent className="space-y-4">
-                    <div className="flex items-center gap-4 mb-6">
-                       <div className="w-20 h-20 rounded-full bg-zinc-800 flex items-center justify-center text-2xl font-bold text-orange-500 border-2 border-orange-500/20 shadow-lg shadow-orange-500/10 transition-transform hover:scale-105 duration-300">
-                          {formState.name ? formState.name.charAt(0).toUpperCase() : 'U'}
-                       </div>
-                       <div>
-                          <div className="text-sm text-zinc-500">Profile Picture</div>
-                          <div className="flex gap-2 mt-2">
-                             <Badge variant="outline">Free Plan</Badge>
-                             <Badge>Pro</Badge>
+        {/* Settings Content Area */}
+        <div className="flex-1 bg-zinc-900/40 backdrop-blur-xl border border-white/5 rounded-3xl overflow-hidden flex flex-col shadow-2xl relative">
+          
+          <div className="flex-1 overflow-y-auto custom-scrollbar p-6 lg:p-10">
+            <form onSubmit={handleSave} className="max-w-2xl mx-auto space-y-8">
+               
+               {activeTab === 'account' && (
+                 <div className="space-y-8 animate-in slide-in-from-right-4 duration-300">
+                    {/* Profile Banner */}
+                    <div className="relative h-32 rounded-2xl bg-gradient-to-r from-orange-600 to-purple-700 overflow-hidden mb-12">
+                       <div className="absolute inset-0 bg-grid-pattern opacity-30"></div>
+                       <div className="absolute -bottom-10 left-6 flex items-end gap-4">
+                          <div className="w-24 h-24 rounded-full bg-zinc-900 p-1 ring-4 ring-zinc-900">
+                             <div className="w-full h-full rounded-full bg-zinc-800 flex items-center justify-center text-3xl font-bold text-orange-500">
+                                {formState.name ? formState.name.charAt(0).toUpperCase() : 'U'}
+                             </div>
+                          </div>
+                          <div className="mb-3">
+                             <h2 className="text-2xl font-bold text-white drop-shadow-md">{formState.name || 'User'}</h2>
+                             <div className="flex gap-2">
+                                <Badge variant="shimmer">PRO MEMBER</Badge>
+                             </div>
                           </div>
                        </div>
                     </div>
-                    <Input 
-                      label={t.displayName} 
-                      value={formState.name} 
-                      onChange={e => setFormState({...formState, name: e.target.value})}
-                    />
-                    <Input 
-                      label={t.email}
-                      value={formState.email} 
-                      onChange={e => setFormState({...formState, email: e.target.value})}
-                      disabled
-                      className="opacity-50 cursor-not-allowed"
-                    />
-                 </CardContent>
-               </Card>
-             )}
 
-             {activeTab === 'preferences' && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>{t.preferences}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                      <div className="flex items-center justify-between p-4 rounded-xl bg-zinc-900/50 border border-zinc-800/50 hover:border-zinc-700 transition-colors">
+                    <div className="space-y-6 pt-4">
                         <div>
-                          <h4 className="font-medium text-white">{t.currency}</h4>
-                          <p className="text-xs text-zinc-500 mt-1">Updates transaction values automatically.</p>
+                           <h3 className="text-lg font-medium text-white mb-4">Profile Information</h3>
+                           <div className="bg-zinc-950/50 border border-white/5 rounded-xl overflow-hidden divide-y divide-white/5">
+                              <div className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                 <label className="text-sm font-medium text-zinc-400 w-32">{t.displayName}</label>
+                                 <Input 
+                                    value={formState.name} 
+                                    onChange={e => setFormState({...formState, name: e.target.value})}
+                                    className="bg-transparent border-none text-right focus:ring-0 focus:bg-zinc-900/50 h-auto py-1 px-2 md:w-64"
+                                 />
+                              </div>
+                              <div className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                 <label className="text-sm font-medium text-zinc-400 w-32">{t.email}</label>
+                                 <div className="text-sm text-zinc-500 px-2">{formState.email}</div>
+                              </div>
+                           </div>
                         </div>
-                        <select 
-                            className="bg-zinc-950 border border-zinc-800 rounded px-2 py-1 text-sm text-white focus:ring-2 focus:ring-orange-500 outline-none"
-                            value={formState.currency}
-                            onChange={(e) => setFormState({...formState, currency: e.target.value as CurrencyCode})}
-                        >
-                            <option value="USD">USD ($)</option>
-                            <option value="EUR">EUR (€)</option>
-                            <option value="IDR">IDR (Rp)</option>
-                        </select>
-                      </div>
-
-                      <div className="flex items-center justify-between p-4 rounded-xl bg-zinc-900/50 border border-zinc-800/50 hover:border-zinc-700 transition-colors">
-                        <div>
-                          <h4 className="font-medium text-white">{t.language}</h4>
-                        </div>
-                        <select 
-                            className="bg-zinc-950 border border-zinc-800 rounded px-2 py-1 text-sm text-white focus:ring-2 focus:ring-orange-500 outline-none"
-                            value={formState.language}
-                            onChange={(e) => setFormState({...formState, language: e.target.value as any})}
-                        >
-                            <option value="en">English</option>
-                            <option value="id">Bahasa Indonesia</option>
-                        </select>
-                      </div>
-                  </CardContent>
-                </Card>
-             )}
-
-             {activeTab === 'notifications' && (
-                <Card>
-                   <CardHeader>
-                      <CardTitle>Notifications</CardTitle>
-                   </CardHeader>
-                   <CardContent className="space-y-4">
-                      <div className="flex items-center justify-between p-4 rounded-xl bg-zinc-900/50 border border-zinc-800/50 hover:border-zinc-700 transition-colors">
-                        <div>
-                          <h4 className="font-medium text-white">Email Alerts</h4>
-                          <p className="text-xs text-zinc-500">Receive weekly spending summaries</p>
-                        </div>
-                        <Switch 
-                            checked={formState.emailAlerts || false}
-                            onCheckedChange={(c) => handleToggle('emailAlerts', c)}
-                        />
-                      </div>
-                      <div className="flex items-center justify-between p-4 rounded-xl bg-zinc-900/50 border border-zinc-800/50 hover:border-zinc-700 transition-colors">
-                        <div>
-                          <h4 className="font-medium text-white">Monthly Report</h4>
-                          <p className="text-xs text-zinc-500">Get a detailed analysis at month end</p>
-                        </div>
-                        <Switch 
-                             checked={formState.monthlyReport || false}
-                             onCheckedChange={(c) => handleToggle('monthlyReport', c)}
-                        />
-                      </div>
-                   </CardContent>
-                </Card>
-             )}
-
-             {activeTab === 'data' && (
-                 <Card className="border-red-500/20">
-                    <CardHeader>
-                       <CardTitle className="text-red-500">Danger Zone</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                       <div className="p-4 bg-red-500/10 rounded-lg border border-red-500/10 flex items-center justify-between">
-                          <div>
-                             <h4 className="font-medium text-white">Reset All Data</h4>
-                             <p className="text-xs text-zinc-400">Permanently delete all transactions and budgets.</p>
-                          </div>
-                          <Button variant="danger" size="sm" type="button" onClick={() => alert("Contact support to reset data.")}>
-                             Reset Data
-                          </Button>
-                       </div>
-                    </CardContent>
-                 </Card>
-             )}
-
-             <div className="pt-4 border-t border-zinc-800 flex justify-end">
-                <Button type="submit" disabled={settingsLoading} className="w-full sm:w-auto min-w-[150px]">
-                  {settingsLoading ? (
-                    <div className="flex items-center gap-2">
-                      <Loader2 className="animate-spin w-4 h-4" />
-                      {t.saving}
                     </div>
-                  ) : t.saveChanges}
-                </Button>
-             </div>
-          </form>
+                 </div>
+               )}
+
+               {activeTab === 'preferences' && (
+                  <div className="space-y-8 animate-in slide-in-from-right-4 duration-300">
+                     <div>
+                        <h3 className="text-lg font-medium text-white mb-1">App Preferences</h3>
+                        <p className="text-sm text-zinc-500 mb-6">Customize your local currency and language.</p>
+                        
+                        <div className="bg-zinc-950/50 border border-white/5 rounded-xl overflow-hidden divide-y divide-white/5">
+                           <div className="p-4 flex items-center justify-between">
+                              <div>
+                                 <div className="text-sm font-medium text-white">{t.currency}</div>
+                                 <div className="text-xs text-zinc-500">Symbol displayed on all transactions</div>
+                              </div>
+                              <select 
+                                  className="bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-1.5 text-sm text-white focus:ring-2 focus:ring-orange-500 outline-none"
+                                  value={formState.currency}
+                                  onChange={(e) => setFormState({...formState, currency: e.target.value as CurrencyCode})}
+                              >
+                                  <option value="USD">USD ($)</option>
+                                  <option value="EUR">EUR (€)</option>
+                                  <option value="IDR">IDR (Rp)</option>
+                              </select>
+                           </div>
+
+                           <div className="p-4 flex items-center justify-between">
+                              <div>
+                                 <div className="text-sm font-medium text-white">{t.language}</div>
+                                 <div className="text-xs text-zinc-500">Language for the user interface</div>
+                              </div>
+                              <select 
+                                  className="bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-1.5 text-sm text-white focus:ring-2 focus:ring-orange-500 outline-none"
+                                  value={formState.language}
+                                  onChange={(e) => setFormState({...formState, language: e.target.value as any})}
+                              >
+                                  <option value="en">English</option>
+                                  <option value="id">Bahasa Indonesia</option>
+                              </select>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               )}
+
+               {activeTab === 'notifications' && (
+                  <div className="space-y-8 animate-in slide-in-from-right-4 duration-300">
+                      <div>
+                        <h3 className="text-lg font-medium text-white mb-1">Email Notifications</h3>
+                        <p className="text-sm text-zinc-500 mb-6">Manage what emails you receive from us.</p>
+
+                        <div className="bg-zinc-950/50 border border-white/5 rounded-xl overflow-hidden divide-y divide-white/5">
+                           <div className="p-4 flex items-center justify-between">
+                              <div className="pr-4">
+                                 <div className="text-sm font-medium text-white">Weekly Summary</div>
+                                 <div className="text-xs text-zinc-500">Receive a weekly digest of your spending habits.</div>
+                              </div>
+                              <Switch 
+                                  checked={formState.emailAlerts || false}
+                                  onCheckedChange={(c) => handleToggle('emailAlerts', c)}
+                              />
+                           </div>
+                           <div className="p-4 flex items-center justify-between">
+                              <div className="pr-4">
+                                 <div className="text-sm font-medium text-white">Monthly Report</div>
+                                 <div className="text-xs text-zinc-500">Detailed analysis at the end of every month.</div>
+                              </div>
+                              <Switch 
+                                  checked={formState.monthlyReport || false}
+                                  onCheckedChange={(c) => handleToggle('monthlyReport', c)}
+                              />
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               )}
+
+               {activeTab === 'data' && (
+                  <div className="space-y-8 animate-in slide-in-from-right-4 duration-300">
+                     <div className="p-6 rounded-2xl bg-red-500/5 border border-red-500/10">
+                        <div className="flex items-start gap-4">
+                           <div className="p-3 bg-red-500/10 rounded-full text-red-500">
+                              <Shield size={24} />
+                           </div>
+                           <div>
+                              <h3 className="text-lg font-medium text-red-500 mb-1">Danger Zone</h3>
+                              <p className="text-sm text-zinc-400 mb-4">
+                                 Actions here are irreversible. Be careful.
+                              </p>
+                              <div className="flex items-center justify-between bg-black/20 p-4 rounded-xl border border-red-500/10">
+                                 <div>
+                                    <div className="text-sm font-medium text-white">Delete All Data</div>
+                                    <div className="text-xs text-zinc-500">Clear transactions and reset budgets.</div>
+                                 </div>
+                                 <Button variant="danger" size="sm" type="button" onClick={() => alert("Please contact support to perform a full reset.")}>
+                                    Reset Data
+                                 </Button>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               )}
+
+            </form>
+          </div>
+          
+          {/* Persistent Footer */}
+          <div className="p-6 border-t border-white/5 bg-zinc-950/30 flex justify-end">
+             <Button onClick={(e) => handleSave(e)} disabled={settingsLoading} className="min-w-[120px]">
+                {settingsLoading ? <Loader2 className="animate-spin w-4 h-4 mr-2" /> : <CheckCircle2 className="w-4 h-4 mr-2" />}
+                {settingsLoading ? t.saving : t.saveChanges}
+             </Button>
+          </div>
         </div>
       </div>
     );
@@ -341,7 +370,12 @@ const AppContent = () => {
           return (
             <div className="space-y-6">
               <DashboardStats stats={stats} formatCurrency={formatCurrency} labels={t} />
-              <Analytics transactions={filteredTransactions} labels={t} formatCurrency={formatCurrency} />
+              <Analytics 
+                transactions={filteredTransactions} 
+                labels={t} 
+                formatCurrency={formatCurrency} 
+                currency={profile?.currency || 'USD'}
+              />
               <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
                  <div className="xl:col-span-2 order-2 xl:order-1">
                     <TransactionList transactions={filteredTransactions.slice(0, 5)} onDelete={handleDeleteTransaction} formatCurrency={formatCurrency} labels={t} />

@@ -1,3 +1,4 @@
+
 import React, { useMemo } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Cell, LabelList } from 'recharts';
 import { Card, CardHeader, CardTitle, CardContent } from './ui/DesignSystem';
@@ -7,9 +8,10 @@ interface Props {
   transactions: Transaction[];
   labels: any;
   formatCurrency: (val: number) => string;
+  currency: string;
 }
 
-export const Analytics: React.FC<Props> = ({ transactions, labels, formatCurrency }) => {
+export const Analytics: React.FC<Props> = ({ transactions, labels, formatCurrency, currency }) => {
   
   // Prepare data for the charts
   const monthlyData = useMemo(() => {
@@ -48,6 +50,16 @@ export const Analytics: React.FC<Props> = ({ transactions, labels, formatCurrenc
     return Object.keys(data).map(key => ({ name: key, value: data[key] })).sort((a,b) => b.value - a.value).slice(0, 5);
   }, [transactions]);
 
+  // Dynamic Axis Formatter
+  const formatAxis = (value: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: currency,
+      notation: 'compact',
+      maximumFractionDigits: 1
+    }).format(value);
+  };
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
       {/* Main Income vs Expense Area Chart */}
@@ -71,7 +83,7 @@ export const Analytics: React.FC<Props> = ({ transactions, labels, formatCurrenc
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
                 <XAxis dataKey="name" stroke="#71717a" tickLine={false} axisLine={false} />
-                <YAxis stroke="#71717a" tickLine={false} axisLine={false} tickFormatter={(value) => `$${value}`} />
+                <YAxis stroke="#71717a" tickLine={false} axisLine={false} tickFormatter={formatAxis} />
                 <Tooltip 
                   contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '8px', color: '#fff' }}
                   formatter={(value: number) => formatCurrency(value)}

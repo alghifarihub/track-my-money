@@ -87,6 +87,15 @@
       .animate-float {
         animation: float 6s ease-in-out infinite;
       }
+
+      /* Shimmer Effect for Pro Badge */
+      @keyframes shimmer {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+      }
+      .animate-shimmer {
+        animation: shimmer 3s linear infinite;
+      }
     </style>
   <script type="importmap">
 {
