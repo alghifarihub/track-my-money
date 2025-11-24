@@ -15,7 +15,7 @@ import { Transaction, DashboardStats as StatsType, UserProfile, CurrencyCode, Bu
 import { TRANSLATIONS } from './constants';
 import { Card, CardContent, CardHeader, CardTitle, Button, Input, Switch, Badge } from './components/ui/DesignSystem';
 import { UserProvider, useUser } from './contexts/UserContext';
-import { supabase } from './lib/supabaseClient';
+import { supabase } from './lib/supabase';
 import { Session } from '@supabase/supabase-js';
 
 type View = 'overview' | 'transactions' | 'budgeting' | 'settings';
