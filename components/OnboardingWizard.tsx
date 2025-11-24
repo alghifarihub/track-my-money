@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, Button, Input } from './ui/DesignSystem';
 import { UserProfile, CurrencyCode, Language } from '../types';
 import { TRANSLATIONS } from '../constants';
-import { ArrowRight, Check, User, Coins, Target, Languages } from 'lucide-react';
+import { ArrowRight, Check, User, Coins, Target, Globe } from 'lucide-react';
 import { useUser } from '../contexts/UserContext';
 
 interface Props {
@@ -15,13 +15,12 @@ export const OnboardingWizard: React.FC<Props> = ({ onFinish }) => {
   const [loading, setLoading] = useState(false);
 
   // Form State
-  // Initialize language from profile but allow changing it instantly in the wizard
-  const [language, setLanguage] = useState<Language>(profile?.language || 'en');
+  const [language, setLanguage] = useState<Language>('en');
   const [name, setName] = useState('');
   const [currency, setCurrency] = useState<CurrencyCode>('IDR');
   const [budgetGoal, setBudgetGoal] = useState('');
 
-  // Use the local language state for translations so the UI updates immediately
+  // Use the selected language for the Wizard text dynamically
   const t = TRANSLATIONS[language];
 
   const handleNext = () => {
@@ -37,11 +36,12 @@ export const OnboardingWizard: React.FC<Props> = ({ onFinish }) => {
     try {
       const budgetNum = parseFloat(budgetGoal.replace(/[^0-9]/g, '')) || 0;
       
+      // Update everything at once
       const newProfile: UserProfile = {
         ...profile!,
         name: name,
         currency: currency,
-        language: language, // Save the selected language
+        language: language,
         onboardingCompleted: true,
         monthlyBudgetGoal: budgetNum
       };
@@ -55,7 +55,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onFinish }) => {
     }
   };
 
-  // Progress bar width calculation (Total steps 4)
+  // Progress bar width calculation (Total 4 steps)
   const progress = (step / 4) * 100;
 
   return (
@@ -76,47 +76,37 @@ export const OnboardingWizard: React.FC<Props> = ({ onFinish }) => {
              <p className="text-zinc-400">{t.setupDesc}</p>
           </div>
 
-          <div className="min-h-[220px] flex flex-col justify-center">
+          <div className="min-h-[250px] flex flex-col justify-center">
             
-            {/* Step 1: Language */}
+            {/* STEP 1: Language */}
             {step === 1 && (
               <div className="space-y-6 animate-in slide-in-from-right-8 fade-in duration-300">
                 <div className="flex justify-center mb-4">
                     <div className="w-16 h-16 rounded-full bg-zinc-800 flex items-center justify-center text-orange-500">
-                       <Languages size={32} />
+                       <Globe size={32} />
                     </div>
                  </div>
                 <label className="block text-sm font-medium text-zinc-300 text-center">{t.stepLang}</label>
-                <div className="grid grid-cols-2 gap-4">
-                   <button
-                      onClick={() => setLanguage('en')}
-                      className={`
-                        flex flex-col items-center justify-center p-4 rounded-xl border transition-all gap-2
-                        ${language === 'en' 
-                           ? 'bg-orange-500/10 border-orange-500 text-white' 
-                           : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:bg-zinc-800 hover:border-zinc-700'}
-                      `}
-                    >
-                      <span className="text-2xl">🇺🇸</span>
-                      <span className="font-bold text-sm">English</span>
-                   </button>
-                   <button
-                      onClick={() => setLanguage('id')}
-                      className={`
-                        flex flex-col items-center justify-center p-4 rounded-xl border transition-all gap-2
-                        ${language === 'id' 
-                           ? 'bg-orange-500/10 border-orange-500 text-white' 
-                           : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:bg-zinc-800 hover:border-zinc-700'}
-                      `}
-                    >
-                      <span className="text-2xl">🇮🇩</span>
-                      <span className="font-bold text-sm">Indonesia</span>
-                   </button>
+                <div className="grid grid-cols-1 gap-3">
+                  <button
+                    onClick={() => setLanguage('en')}
+                    className={`flex items-center justify-between p-4 rounded-xl border transition-all ${language === 'en' ? 'bg-orange-500/10 border-orange-500 text-white' : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:bg-zinc-800'}`}
+                  >
+                    <span className="font-bold">English</span>
+                    {language === 'en' && <Check size={18} className="text-orange-500" />}
+                  </button>
+                  <button
+                    onClick={() => setLanguage('id')}
+                    className={`flex items-center justify-between p-4 rounded-xl border transition-all ${language === 'id' ? 'bg-orange-500/10 border-orange-500 text-white' : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:bg-zinc-800'}`}
+                  >
+                    <span className="font-bold">Bahasa Indonesia</span>
+                    {language === 'id' && <Check size={18} className="text-orange-500" />}
+                  </button>
                 </div>
               </div>
             )}
 
-            {/* Step 2: Name */}
+            {/* STEP 2: Name */}
             {step === 2 && (
               <div className="space-y-4 animate-in slide-in-from-right-8 fade-in duration-300">
                  <div className="flex justify-center mb-6">
@@ -135,7 +125,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onFinish }) => {
               </div>
             )}
 
-            {/* Step 3: Currency */}
+            {/* STEP 3: Currency */}
             {step === 3 && (
               <div className="space-y-6 animate-in slide-in-from-right-8 fade-in duration-300">
                 <div className="flex justify-center mb-4">
@@ -164,7 +154,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onFinish }) => {
               </div>
             )}
 
-            {/* Step 4: Budget */}
+            {/* STEP 4: Budget */}
             {step === 4 && (
               <div className="space-y-4 animate-in slide-in-from-right-8 fade-in duration-300">
                 <div className="flex justify-center mb-6">
@@ -182,7 +172,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onFinish }) => {
                     className="text-center text-lg h-12"
                  />
                  <p className="text-xs text-center text-zinc-500">
-                    {t.budgetDesc}
+                    We'll use this to help you track your monthly limits.
                  </p>
               </div>
             )}
@@ -197,7 +187,7 @@ export const OnboardingWizard: React.FC<Props> = ({ onFinish }) => {
             )}
             
             {step < 4 ? (
-               <Button onClick={handleNext} disabled={step === 2 && !name} className="flex-1">
+               <Button onClick={handleNext} disabled={(step === 2 && !name)} className="flex-1">
                  {t.next} <ArrowRight size={18} className="ml-2" />
                </Button>
             ) : (
