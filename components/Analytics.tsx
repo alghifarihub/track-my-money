@@ -12,32 +12,49 @@ interface Props {
 
 export const Analytics: React.FC<Props> = ({ transactions, labels, formatCurrency, currency }) => {
   
-  // Prepare data for the charts
-  const monthlyData = useMemo(() => {
-    const data: Record<string, { income: number; expense: number; orderDate: number }> = {};
+  // Prepare data for the charts (Daily Trend with Zero-Fill)
+  const chartData = useMemo(() => {
+    if (transactions.length === 0) return [];
+
+    // 1. Group transactions by Date (YYYY-MM-DD)
+    const rawData: Record<string, { income: number; expense: number }> = {};
     
+    // Find min and max date to create the range
+    const dates = transactions.map(t => new Date(t.date).getTime());
+    const minDate = new Date(Math.min(...dates));
+    const maxDate = new Date(Math.max(...dates));
+
+    // Populate raw data
     transactions.forEach(t => {
-      const date = new Date(t.date);
-      // Format: "Oct 23"
-      const monthKey = date.toLocaleString('default', { month: 'short', year: '2-digit' });
-      // Create a sort key (YYYYMM)
-      const orderDate = date.getFullYear() * 100 + date.getMonth();
+      const dateStr = t.date.split('T')[0]; // YYYY-MM-DD
+      if (!rawData[dateStr]) rawData[dateStr] = { income: 0, expense: 0 };
       
-      if (!data[monthKey]) data[monthKey] = { income: 0, expense: 0, orderDate };
-      
-      if (t.type === 'income') data[monthKey].income += t.amount;
-      else data[monthKey].expense += t.amount;
+      if (t.type === 'income') rawData[dateStr].income += t.amount;
+      else rawData[dateStr].expense += t.amount;
     });
 
-    // Convert to array and sort by date
-    return Object.keys(data)
-      .map(key => ({
-        name: key,
-        income: data[key].income,
-        expense: data[key].expense,
-        orderDate: data[key].orderDate
-      }))
-      .sort((a, b) => a.orderDate - b.orderDate);
+    // 2. Fill in the Gaps (Zero-Fill)
+    const filledData = [];
+    const currentDate = new Date(minDate);
+    
+    // Iterate from Start Date to End Date
+    while (currentDate <= maxDate) {
+      const dateKey = currentDate.toISOString().split('T')[0];
+      const dayData = rawData[dateKey] || { income: 0, expense: 0 };
+      
+      filledData.push({
+        // Display Name: "25 Nov"
+        name: currentDate.toLocaleDateString('en-US', { day: 'numeric', month: 'short' }),
+        fullDate: dateKey,
+        income: dayData.income,
+        expense: dayData.expense
+      });
+
+      // Next Day
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    return filledData;
   }, [transactions]);
 
   const categoryData = useMemo(() => {
@@ -69,7 +86,7 @@ export const Analytics: React.FC<Props> = ({ transactions, labels, formatCurrenc
         <CardContent>
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={monthlyData}>
+              <AreaChart data={chartData}>
                 <defs>
                   <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
@@ -81,14 +98,37 @@ export const Analytics: React.FC<Props> = ({ transactions, labels, formatCurrenc
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
-                <XAxis dataKey="name" stroke="#71717a" tickLine={false} axisLine={false} />
+                <XAxis 
+                  dataKey="name" 
+                  stroke="#71717a" 
+                  tickLine={false} 
+                  axisLine={false}
+                  minTickGap={30} 
+                />
                 <YAxis stroke="#71717a" tickLine={false} axisLine={false} tickFormatter={formatAxis} />
                 <Tooltip 
                   contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '8px', color: '#fff' }}
                   formatter={(value: number) => formatCurrency(value)}
+                  labelStyle={{ color: '#a1a1aa' }}
                 />
-                <Area type="monotone" dataKey="income" stroke="#10b981" fillOpacity={1} fill="url(#colorIncome)" strokeWidth={2} />
-                <Area type="monotone" dataKey="expense" stroke="#ef4444" fillOpacity={1} fill="url(#colorExpense)" strokeWidth={2} />
+                <Area 
+                  type="monotone" 
+                  dataKey="income" 
+                  stroke="#10b981" 
+                  fillOpacity={1} 
+                  fill="url(#colorIncome)" 
+                  strokeWidth={2}
+                  activeDot={{ r: 6 }}
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="expense" 
+                  stroke="#ef4444" 
+                  fillOpacity={1} 
+                  fill="url(#colorExpense)" 
+                  strokeWidth={2}
+                  activeDot={{ r: 6 }} 
+                />
               </AreaChart>
             </ResponsiveContainer>
           </div>
