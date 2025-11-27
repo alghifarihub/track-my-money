@@ -1,4 +1,4 @@
-# 💸 ghifarmkcy Personal Finance Tracker
+# ghifarmkcy Personal Finance Tracker
 
 ![Project Banner](public/4.png)
 
@@ -19,23 +19,23 @@ Experience the app live here:
 
 ---
 
-## ✨ Features
+## Features
 
-### 🎬 Cinematic User Experience
+### Cinematic User Experience
 - **High-Performance Landing Page:** Featuring a video background and "GTA VI-style" directional scroll animations powered by `framer-motion`.
 - **Seamless Transitions:** Smooth page transitions between Landing, Login, and Dashboard views.
 
-### 📱 Native-Grade Mobile Optimization
+### Native-Grade Mobile Optimization
 - **Mobile First Design:** Layout optimized for smartphones with a dedicated **Bottom Navigation Bar**.
 - **Floating Action Button (FAB):** Quick transaction entry designed for one-thumb usage.
 - **Responsive Charts:** Analytics that look great on any screen size.
 
-### 📊 Real-time Dashboard
+### Real-time Dashboard
 - **Interactive Analytics:** Visualize cash flow with dynamic Area Charts and Bar Charts (Recharts).
 - **Smart Metrics:** Real-time calculation of Savings Rate, Total Balance, and Monthly Budget usage.
 - **Date Range Filter:** Analyze data by specific time periods.
 
-### 🛡️ Enterprise-Level Security
+### Enterprise-Level Security
 - **Supabase Auth:** Secure Email/Password authentication.
 - **Data Isolation:** Strict Row Level Security (RLS) policies ensure users only see their own data.
 - **Smart Data Handling:** Separation between "Demo Mode" data and "Real User" data.
