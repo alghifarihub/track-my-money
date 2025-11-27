@@ -1,6 +1,6 @@
 # 💸 ghifarmkcy Personal Finance Tracker
 
-![Project Banner](public/photo/desktop-demo.png)
+![Project Banner](public/4.png)
 
 > **Master Your Money Like a Pro.**
 > A modern, mobile-first financial command center built with the latest web technologies.
