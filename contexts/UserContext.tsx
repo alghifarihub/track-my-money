@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { UserProfile } from '../types';
 import { financeService } from '../services/financeService';
@@ -16,11 +17,14 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   const refreshProfile = async () => {
+    setLoading(true);
     try {
+      // financeService now intelligently checks if it's Demo or Live
       const data = await financeService.getUserSettings();
       setProfile(data);
     } catch (error) {
       console.error("Failed to load user profile", error);
+      setProfile(null); 
     } finally {
       setLoading(false);
     }
@@ -31,18 +35,11 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const updateProfile = async (newProfile: UserProfile) => {
-    if (!profile) return;
-
+    // Optimistic Update
+    setProfile(newProfile);
+    
     try {
-      // Handle Currency Conversion Logic Centrally
-      if (profile.currency !== newProfile.currency) {
-        await financeService.convertDataCurrency(profile.currency, newProfile.currency);
-      }
-
-      // Save to Backend/Storage
       const updated = await financeService.updateUserSettings(newProfile);
-      
-      // Update State
       setProfile(updated);
     } catch (error) {
       console.error("Failed to update profile", error);

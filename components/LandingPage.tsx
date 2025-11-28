@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Code, Database, Layout, Smartphone, Github, Instagram, Linkedin, Globe, Wallet, PieChart, Coins, CreditCard, ExternalLink, ArrowRight } from 'lucide-react';
+
+import React, { useState } from 'react';
+import { Code, Database, Layout, Smartphone, Github, Instagram, Linkedin, Globe, Wallet, PieChart, Coins, CreditCard, ExternalLink, ArrowRight, Play, LogIn } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 
 // --- Reusable Component for Framer Motion Reveal ---
@@ -58,7 +59,12 @@ const ScrollSlideIn = ({ direction, children, className = "", delay = 0 }: Scrol
     );
 };
 
-export const LandingPage = ({ onStart }: { onStart: () => void }) => {
+interface Props {
+    onStart: () => void;      // Triggers Auth/Login Page
+    onEnterDemo: () => void;  // Triggers LocalStorage Demo Mode
+}
+
+export const LandingPage = ({ onStart, onEnterDemo }: Props) => {
   const [lang, setLang] = useState<'id' | 'en'>('id'); // Default ID
   const { scrollY } = useScroll();
   const y1 = useTransform(scrollY, [0, 500], [0, 200]);
@@ -66,13 +72,13 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
 
   const CONTENT = {
     id: {
-      nav: { signIn: "Masuk", start: "Mulai Demo" },
+      nav: { signIn: "Masuk", start: "Coba Demo" },
       hero: {
         titlePrefix: "Kendalikan",
         titleSuffix: "Uang Anda.",
-        desc: "Kelola dan optimalkan keuangan pribadi Anda melalui sistem analisis yang terstruktur, akurat, dan mudah digunakan",
-        ctaMain: "Coba Gratis Sekarang",
-        ctaSec: "Lihat Kode"
+        desc: "Kelola dan optimalkan keuangan pribadi Anda melalui sistem analisis yang terstruktur. Data aman di database atau coba mode demo instan.",
+        ctaMain: "Masuk / Daftar",
+        ctaSec: "Mode Demo (Tanpa Login)"
       },
       marquee: [
         "Real-time Analytics", "Aman & Privat", "Tanpa Iklan", "Mobile First", "Export CSV", "Smart Budgeting", "Multi-Currency", "Dark Mode"
@@ -119,13 +125,13 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
       footer: "Proyek Mahasiswa."
     },
     en: {
-      nav: { signIn: "Sign In", start: "Start Demo" },
+      nav: { signIn: "Sign In", start: "Try Demo" },
       hero: {
         titlePrefix: "Master Your",
         titleSuffix: "Money Flow.",
-        desc: "Not just an expense tracker. It's your personal financial command center. Real-time insights, no boring spreadsheets.",
-        ctaMain: "Start Free Trial",
-        ctaSec: "View Code"
+        desc: "Not just an expense tracker. It's your personal financial command center. Secure cloud data or instant local demo mode.",
+        ctaMain: "Login / Register",
+        ctaSec: "Demo Mode (No Login)"
       },
       marquee: [
         "Real-time Analytics", "Secure & Private", "No Ads", "Mobile First", "Export CSV", "Smart Budgeting", "Multi-Currency", "Dark Mode"
@@ -202,8 +208,8 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
              <button onClick={onStart} className="text-sm font-medium text-zinc-400 hover:text-white transition-colors hidden sm:block">
                 {t.nav.signIn}
              </button>
-             <button onClick={onStart} className="px-5 py-2 rounded-full bg-white text-black text-sm font-bold hover:scale-105 transition-transform hover:shadow-[0_0_20px_rgba(255,255,255,0.3)]">
-                {t.nav.start}
+             <button onClick={onEnterDemo} className="px-5 py-2 rounded-full bg-white text-black text-sm font-bold hover:scale-105 transition-transform hover:shadow-[0_0_20px_rgba(255,255,255,0.3)] flex items-center gap-2">
+                <Play size={14} className="fill-black" /> {t.nav.start}
              </button>
         </div>
       </motion.nav>
@@ -218,7 +224,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
                  loop 
                  muted 
                  playsInline 
-                 className="w-full h-full object-cover"
+                 className="w-full h-full object-cover opacity-60"
              >
                  <source src="/3.mp4" type="video/mp4" />
                  {/* Fallback color if video fails */}
@@ -227,6 +233,7 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
              
              {/* Dark Overlay for Text Readability */}
              <div className="absolute inset-0 bg-black/60 z-10"></div>
+             <div className="absolute inset-0 bg-grid-pattern opacity-30 z-10"></div>
              
              {/* Gradient Fade to connect with next section naturally */}
              <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#050505] to-transparent z-10"></div>
@@ -248,10 +255,16 @@ export const LandingPage = ({ onStart }: { onStart: () => void }) => {
             
             <RevealOnScroll delay={0.5}>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6">
-                <button onClick={onStart} className="w-full sm:w-auto px-8 py-4 bg-orange-500 text-white rounded-full font-bold text-lg hover:bg-orange-600 transition-all animate-pulse-glow hover:scale-105 active:scale-95 shadow-lg shadow-orange-900/50">
+                
+                {/* PRIMARY CTA: LOGIN / REGISTER (Supabase) */}
+                <button onClick={onStart} className="w-full sm:w-auto px-8 py-4 bg-orange-500 text-white rounded-full font-bold text-lg hover:bg-orange-600 transition-all animate-pulse-glow hover:scale-105 active:scale-95 shadow-lg shadow-orange-900/50 flex items-center justify-center gap-2">
+                    <LogIn size={20} />
                     {t.hero.ctaMain}
                 </button>
-                <button onClick={onStart} className="w-full sm:w-auto px-8 py-4 border border-zinc-500 bg-white/5 backdrop-blur-sm rounded-full font-medium text-zinc-200 hover:text-white hover:bg-white/10 transition-all">
+
+                {/* SECONDARY CTA: DEMO MODE (Local Storage) */}
+                <button onClick={onEnterDemo} className="w-full sm:w-auto px-8 py-4 border border-zinc-500 bg-white/5 backdrop-blur-sm rounded-full font-medium text-zinc-200 hover:text-white hover:bg-white/10 transition-all flex items-center justify-center gap-2">
+                    <Play size={20} />
                     {t.hero.ctaSec}
                 </button>
                 </div>
