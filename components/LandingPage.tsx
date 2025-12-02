@@ -555,7 +555,7 @@ export const LandingPage = ({ onStart, onEnterDemo }: Props) => {
       {/* Footer */}
       <footer className="py-8 text-center text-zinc-600 text-sm border-t border-white/5 bg-black">
           <RevealOnScroll>
-             <p>&copy; 2025 M. Gilang Alghipari. {t.footer}</p>
+             <p>&copy; 2025 M. Gilang alghipari. {t.footer}</p>
           </RevealOnScroll>
       </footer>
     </div>
