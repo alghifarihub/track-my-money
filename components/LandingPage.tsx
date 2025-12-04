@@ -488,7 +488,7 @@ export const LandingPage = ({ onStart, onEnterDemo }: Props) => {
                                   <div className="absolute inset-0 rounded-full border border-orange-500/50 animate-spin-slow"></div>
                                   <div className="w-full h-full rounded-full overflow-hidden border-4 border-zinc-900 bg-zinc-800 relative z-10 group-hover:scale-105 transition-transform duration-500">
                                       <img 
-                                        src="https://github.com/Gilang657.png" 
+                                        src="https://github.com/alghifarihub.png" 
                                         onError={(e) => {
                                             e.currentTarget.src = "https://api.dicebear.com/7.x/avataaars/svg?seed=Gilang&backgroundColor=18181b";
                                         }}
@@ -524,7 +524,7 @@ export const LandingPage = ({ onStart, onEnterDemo }: Props) => {
                               </div>
 
                               <div className="flex flex-wrap justify-center md:justify-start gap-4 pt-4">
-                                  <SocialButton icon={<Github size={20} />} label={t.about.social.gh} href="https://github.com/Gilang657" />
+                                  <SocialButton icon={<Github size={20} />} label={t.about.social.gh} href="https://github.com/alghifarihub" />
                                   <SocialButton icon={<Instagram size={20} />} label={t.about.social.ig} href="#" />
                                   <SocialButton icon={<Linkedin size={20} />} label={t.about.social.li} href="#" />
                               </div>
