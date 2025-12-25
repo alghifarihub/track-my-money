@@ -104,7 +104,7 @@ export const LandingPage = ({ onStart, onEnterDemo }: Props) => {
         title: "Dibalik Kode.",
         name: "M.GILANG ALGHIPARI",
         role: "",
-        bio: "Kami percaya bahwa software keuangan terbaik adalah yang transparan dan mudah digunakan. Proyek ini adalah manifestasi dari pembelajaran kami.",
+        bio: "Saya percaya bahwa software keuangan terbaik adalah yang transparan dan mudah digunakan. Proyek ini adalah manifestasi dari pembelajaran Saya.",
         status: "Open to Work / Collaboration",
         social: {
             gh: "GitHub",
