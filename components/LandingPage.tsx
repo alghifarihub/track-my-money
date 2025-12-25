@@ -102,9 +102,9 @@ export const LandingPage = ({ onStart, onEnterDemo }: Props) => {
       about: {
         badge: "Meet The Developer",
         title: "Dibalik Kode.",
-        name: "M. Gilang Alghipari",
-        role: "Mahasiswa Semester 1 • STMIK Cirebon",
-        bio: "Saya percaya bahwa software keuangan terbaik adalah yang transparan dan mudah digunakan. Proyek ini adalah manifestasi dari pembelajaran saya dalam Full-Stack Development.",
+        name: "M.GILANG ALGHIPARI",
+        role: "",
+        bio: "Kami percaya bahwa software keuangan terbaik adalah yang transparan dan mudah digunakan. Proyek ini adalah manifestasi dari pembelajaran kami.",
         status: "Open to Work / Collaboration",
         social: {
             gh: "GitHub",
@@ -155,8 +155,8 @@ export const LandingPage = ({ onStart, onEnterDemo }: Props) => {
       about: {
         badge: "Meet The Developer",
         title: "Behind the Code.",
-        name: "M. Gilang Alghipari",
-        role: "1st Semester Student • STMIK Cirebon",
+        name: "M. Gilang pari",
+        role: "",
         bio: "I believe the best financial software is transparent and easy to use. This project is a manifestation of my learning journey in Full-Stack Development.",
         status: "Open to Work / Collaboration",
         social: {
